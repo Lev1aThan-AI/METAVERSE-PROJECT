@@ -1,5 +1,3 @@
-// gameLogic/updateSchool.js
-
 function updateSchoolInteriorPosition() {
   let speed = 5;
   let newX = playerX;
@@ -8,10 +6,10 @@ function updateSchoolInteriorPosition() {
   let dx = 0;
   let dy = 0;
 
-  if (keyIsDown(LEFT_ARROW)) dx -= 1;
+  if (keyIsDown(LEFT_ARROW))  dx -= 1;
   if (keyIsDown(RIGHT_ARROW)) dx += 1;
-  if (keyIsDown(UP_ARROW)) dy -= 1;
-  if (keyIsDown(DOWN_ARROW)) dy += 1;
+  if (keyIsDown(UP_ARROW))    dy -= 1;
+  if (keyIsDown(DOWN_ARROW))  dy += 1;
 
   if (joystick.active) {
     dx = joystick.dx;
@@ -46,18 +44,18 @@ function updateSchoolInteriorPosition() {
   if (isMoving) {
     let currentTime = millis();
     if (currentTime - lastFrameTime >= FRAME_DURATION) {
-      currentFrame = (currentFrame + 1) % vikingRightFrames.length;
+      currentFrame = (currentFrame + 1) % 5;
       lastFrameTime = currentTime;
     }
 
-    let shouldMove = joystick.active;
-    if (!shouldMove) {
-      if (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) || keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW)) {
+    let shouldMove = false;
+    if (joystick.active) shouldMove = true;
+    else {
+      if (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) ||
+          keyIsDown(UP_ARROW)   || keyIsDown(DOWN_ARROW)) {
         if (keyPressStartTime === 0) keyPressStartTime = currentTime;
         if (currentTime - keyPressStartTime >= MIN_KEY_HOLD_TIME) shouldMove = true;
-      } else {
-        keyPressStartTime = 0;
-      }
+      } else keyPressStartTime = 0;
     }
 
     if (shouldMove) {
@@ -67,16 +65,17 @@ function updateSchoolInteriorPosition() {
       playerX = newX;
       playerY = newY;
 
-      // Exit school when stepping on bottom door
+      playerX = constrain(playerX, 0, schoolInterior.width - 75);
+      playerY = constrain(playerY, 0, schoolInterior.height - 75);
+
+      // Exit door back to world
       if (collides(playerX, playerY, 75, 75,
-                   schoolBottomDoor.x, schoolBottomDoor.y,
-                   schoolBottomDoor.w, schoolBottomDoor.h)
+                   schoolBottomDoor.x, schoolBottomDoor.y, schoolBottomDoor.w, schoolBottomDoor.h)
           && !isTransitioning) {
         isTransitioning = true;
         gameState = 'game';
-        // Place just outside school door to match entrance position
-        playerX = schoolDoor.x + schoolDoor.w / 2;
-        playerY = schoolDoor.y + schoolDoor.h + 20; // Adjusted to align with new door position
+        playerX = 3750;
+        playerY = 2390;
         cameraX = playerX - width / (2 * zoom);
         cameraY = playerY - height / (2 * zoom);
         setTimeout(() => { isTransitioning = false; }, 500);
@@ -87,7 +86,4 @@ function updateSchoolInteriorPosition() {
     currentFrame = 0;
     keyPressStartTime = 0;
   }
-
-  playerX = constrain(playerX, 0, schoolInterior.width - 75);
-  playerY = constrain(playerY, 0, schoolInterior.height - 75);
 }

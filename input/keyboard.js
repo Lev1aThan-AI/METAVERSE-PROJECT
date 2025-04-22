@@ -1,4 +1,12 @@
+// input/keyboard.js
+
 function keyPressed() {
+  // Toggle Settings popup on 'Escape' key
+  if (keyCode === ESCAPE) {
+    showSettings = !showSettings;
+    return false; // prevent default browser behavior
+  }
+
   // Toggle Minimap on 'M' key (press again to close)
   if (key === 'M' || key === 'm') {
     showMiniMap = !showMiniMap;

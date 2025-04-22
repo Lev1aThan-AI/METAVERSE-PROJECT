@@ -1,20 +1,36 @@
+// rendering/ui/hud/coinScore.js
+
 function drawCoinScore() {
-    fill(0, 0, 0, 150);
-    rect(4, 4, 80, 24, 5);
-  
-    imageMode(CENTER);
-    if (coinImage && coinImage.width > 0 && coinImage.height > 0) {
-      image(coinImage, 16, 16, 16, 16);
-    } else {
-      fill(255, 215, 0);
-      ellipse(16, 16, 16);
-    }
-  
-    fill(255);
-    textSize(16);
-    textAlign(LEFT, CENTER);
-    text(`${coinScore}`, 28, 16);
-  }
-  
-  // Attach to global scope
-  window.drawCoinScore = drawCoinScore;
+  // 1) original panel natural size, previously halved
+  const origW = coinBalanceImage.width;
+  const origH = coinBalanceImage.height;
+  const baseW = origW / 2;
+  const baseH = origH / 2;
+
+  // 2) reduce that size by a further 30% (i.e. keep 70% of half)
+  const scaleFactor = 0.7;
+  const panelWidth  = baseW * scaleFactor;
+  const panelHeight = baseH * scaleFactor;
+
+  // 3) position at top‑left (8px margin)
+  const panelX = 8;
+  const panelY = 8;
+
+  // 4) draw the scaled panel graphic
+  imageMode(CORNER);
+  image(coinBalanceImage, panelX, panelY, panelWidth, panelHeight);
+
+  // 5) draw the coin count to the right of the baked‑in coin
+  textFont('IM Fell English', 'Arial');
+  textSize(14); // slightly larger for readability
+  textAlign(LEFT, CENTER);
+  fill(255, 240, 200);
+  // assume coin icon height equals panelHeight
+  const iconWidth = panelHeight;
+  const textX = panelX + iconWidth + 8;
+  const textY = panelY + panelHeight / 2;
+  text(`${coinScore}`, textX, textY);
+}
+
+// Attach to global scope
+window.drawCoinScore = drawCoinScore;

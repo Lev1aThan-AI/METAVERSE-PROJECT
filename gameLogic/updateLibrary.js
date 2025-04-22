@@ -1,5 +1,3 @@
-// gameLogic/updateLibrary.js
-
 function updateLibraryInteriorPosition() {
     let speed = 5;
     let newX = playerX;
@@ -8,10 +6,10 @@ function updateLibraryInteriorPosition() {
     let dx = 0;
     let dy = 0;
   
-    if (keyIsDown(LEFT_ARROW)) dx -= 1;
+    if (keyIsDown(LEFT_ARROW))  dx -= 1;
     if (keyIsDown(RIGHT_ARROW)) dx += 1;
-    if (keyIsDown(UP_ARROW)) dy -= 1;
-    if (keyIsDown(DOWN_ARROW)) dy += 1;
+    if (keyIsDown(UP_ARROW))    dy -= 1;
+    if (keyIsDown(DOWN_ARROW))  dy += 1;
   
     if (joystick.active) {
       dx = joystick.dx;
@@ -46,52 +44,46 @@ function updateLibraryInteriorPosition() {
     if (isMoving) {
       let currentTime = millis();
       if (currentTime - lastFrameTime >= FRAME_DURATION) {
-        currentFrame = (currentFrame + 1) % vikingRightFrames.length;
+        currentFrame = (currentFrame + 1) % 5;
         lastFrameTime = currentTime;
       }
   
-      let shouldMove = joystick.active;
-      if (!shouldMove) {
-        if (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) || keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW)) {
+      let shouldMove = false;
+      if (joystick.active) shouldMove = true;
+      else {
+        if (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) ||
+            keyIsDown(UP_ARROW)   || keyIsDown(DOWN_ARROW)) {
           if (keyPressStartTime === 0) keyPressStartTime = currentTime;
           if (currentTime - keyPressStartTime >= MIN_KEY_HOLD_TIME) shouldMove = true;
-        } else {
-          keyPressStartTime = 0;
-        }
+        } else keyPressStartTime = 0;
       }
   
       if (shouldMove) {
         newX = playerX + dx * speed;
         newY = playerY + dy * speed;
   
-        let canMove = true;
+        playerX = newX;
+        playerY = newY;
   
-        if (canMove) {
-          playerX = newX;
-          playerY = newY;
+        playerX = constrain(playerX, 0, libraryInterior.width - 75);
+        playerY = constrain(playerY, 0, libraryInterior.height - 75);
   
-          // Exit library when stepping on bottom door
-          if (collides(playerX, playerY, 75, 75,
-                       libraryBottomDoor.x, libraryBottomDoor.y,
-                       libraryBottomDoor.w, libraryBottomDoor.h)
-              && !isTransitioning) {
-            isTransitioning = true;
-            gameState = 'game';
-            // Place just outside library door to avoid immediate re-entry
-            playerX = libraryDoor.x + libraryDoor.w / 2;
-            playerY = libraryDoor.y + libraryDoor.h + 20;
-            cameraX = playerX - width / (2 * zoom);
-            cameraY = playerY - height / (2 * zoom);
-            setTimeout(() => { isTransitioning = false; }, 500);
-            return;
-          }
+        // Exit door back to world
+        if (collides(playerX, playerY, 75, 75,
+                     libraryBottomDoor.x, libraryBottomDoor.y, libraryBottomDoor.w, libraryBottomDoor.h)
+            && !isTransitioning) {
+          isTransitioning = true;
+          gameState = 'game';
+          playerX = 625;
+          playerY = 2350;
+          cameraX = playerX - width / (2 * zoom);
+          cameraY = playerY - height / (2 * zoom);
+          setTimeout(() => { isTransitioning = false; }, 500);
+          return;
         }
       }
     } else {
       currentFrame = 0;
       keyPressStartTime = 0;
     }
-  
-    playerX = constrain(playerX, 0, libraryInterior.width - 75);
-    playerY = constrain(playerY, 0, libraryInterior.height - 75);
-}
+  }

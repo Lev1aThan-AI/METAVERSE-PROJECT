@@ -1,4 +1,3 @@
-// sketch.js
 let gameState = 'menu';
 let playerX, playerY;
 let mapWidth = 4000;
@@ -8,6 +7,13 @@ let zoom = 0.6;
 let showMiniMap = false;
 let showInventory = false;
 let playerHP = 100;
+let volumeLevel = 0.5;
+let draggingVolume = false;
+let showSettings = false;
+let musicMuted = false;
+
+
+
 
 let inventory = {
   apple: 0,
@@ -86,6 +92,12 @@ let libraryInterior = {
   height: 1200
 };
 
+// Touchpoint variables for the bottom center of shop.png
+let touchpointX;
+let touchpointY;
+let touchpointWidth = 50;
+let touchpointHeight = 50;
+
 let currentDirection = 'right';
 let lastDirection = 'right';
 let currentFrame = 0;
@@ -120,6 +132,7 @@ function setup() {
   createCanvas(360, 640);
   let canvas = select('canvas');
   canvas.elt.setAttribute('willReadFrequently', 'true');
+
   playerX = 2000;
   playerY = 850;
   cameraX = playerX - width / (2 * zoom);
@@ -131,49 +144,33 @@ function setup() {
     xpToNextLevel[level] = 10 * (level * level) + 10;
   }
 
-  // Add Joniko as an obstacle in cinema
-  obstacles.push({
-    type: 'joniko',
+  touchpointX = shopX + shopWidth / 2 - touchpointWidth / 2;
+  touchpointY = shopY + shopHeight;
+
+  obstacles.push({ type: 'joniko',
     x: jonikoX - jonikoWidth / 2,
     y: jonikoY - jonikoHeight / 2,
-    w: jonikoWidth,
-    h: jonikoHeight
-  });
-
-  // Add Ermalo as an obstacle in cinema
-  obstacles.push({
-    type: 'ermalo',
+    w: jonikoWidth, h: jonikoHeight });
+  obstacles.push({ type: 'ermalo',
     x: ermaloX - ermaloWidth / 2,
     y: ermaloY - ermaloHeight / 2,
-    w: ermaloWidth,
-    h: ermaloHeight
-  });
-
-  // Add Maxo as an obstacle in cinema
-  obstacles.push({
-    type: 'maxo',
+    w: ermaloWidth, h: ermaloHeight });
+  obstacles.push({ type: 'maxo',
     x: maxoX - maxoWidth / 2,
     y: maxoY - maxoHeight / 2,
-    w: maxoWidth,
-    h: maxoHeight
-  });
-
-  // Add Giomari as an obstacle in cinema
-  obstacles.push({
-    type: 'giomari',
+    w: maxoWidth, h: maxoHeight });
+  obstacles.push({ type: 'giomari',
     x: giomariX - giomariWidth / 2,
     y: giomariY - giomariHeight / 2,
-    w: giomariWidth,
-    h: giomariHeight
-  });
-
-  // Add Healing Station as an obstacle in hospital
-  obstacles.push({
-    type: 'healing_station',
+    w: giomariWidth, h: giomariHeight });
+  obstacles.push({ type: 'healing_station',
     x: healingStationX - healingStationWidth / 2,
     y: healingStationY - healingStationHeight / 2,
-    w: healingStationWidth,
-    h: healingStationHeight
+    w: healingStationWidth, h: healingStationHeight });
+
+  // **ONLY CHANGED**: unlock audio on first user gesture, then start music loop
+  userStartAudio().then(() => {
+    startGameMusic();
   });
 }
 
@@ -182,6 +179,15 @@ function draw() {
 
   if (gameState === 'menu') {
     drawMenu();
+    if (showSettings) {
+      drawSettingsWindow(); // now comes from settingsMenu.js
+    }
+    function keyPressed() {
+      if (keyCode === ESCAPE && showSettings) {
+        showSettings = false;
+      }
+    }
+    
 
   } else if (gameState === 'game') {
     updatePlayerPosition();
@@ -194,10 +200,14 @@ function draw() {
 
     drawGame();
 
-    let isCollidingWithShop = collides(playerX, playerY, 75, 75, shopX, shopY, shopWidth, shopHeight);
-    if (isCollidingWithShop && !hasDismissedShopPopup) {
+    let isCollidingWithTouchpoint = collides(
+      playerX, playerY, 75, 75,
+      touchpointX, touchpointY,
+      touchpointWidth, touchpointHeight
+    );
+    if (isCollidingWithTouchpoint && !hasDismissedShopPopup) {
       showShopPopup = true;
-    } else if (!isCollidingWithShop) {
+    } else if (!isCollidingWithTouchpoint) {
       showShopPopup = false;
       showMarketplace = false;
       hasDismissedShopPopup = false;
@@ -209,12 +219,12 @@ function draw() {
     drawLevelAndXP();
     drawCoinScore();
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();  // Ensure only one call to drawMiniMap
+    try {
+      if (showMiniMap) drawMiniMap();
+    } catch (error) {
+      console.error('Error rendering world minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
 
   } else if (gameState === 'castleInterior') {
     updateCastleInteriorPosition();
@@ -235,74 +245,18 @@ function draw() {
     if (showComputerPopup) drawComputerPopup();
 
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();
+    try {
+      if (showMiniMap) drawCastleInteriorMiniMap();
+    } catch (error) {
+      console.error('Error rendering castle minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
 
   } else if (gameState === 'cinemaInterior') {
     updateCinemaInteriorPosition();
     drawCinemaInterior();
 
-    let isCollidingWithJoniko = collides(
-      playerX, playerY, 75, 75,
-      jonikoX - jonikoWidth / 2,
-      jonikoY - jonikoHeight / 2,
-      jonikoWidth, jonikoHeight
-    );
-    if (isCollidingWithJoniko && !hasDismissedJonikoPopup) {
-      showJonikoPopup = true;
-      if (!hasPlayedJonikoSound) {
-        jonikoSound.play();
-        hasPlayedJonikoSound = true;
-      }
-    } else if (!isCollidingWithJoniko) {
-      showJonikoPopup = false;
-      hasDismissedJonikoPopup = false;
-      hasPlayedJonikoSound = false;
-    }
-    if (showJonikoPopup) drawJonikoPopup();
-
-    let isCollidingWithErmalo = collides(
-      playerX, playerY, 75, 75,
-      ermaloX - ermaloWidth / 2,
-      ermaloY - ermaloHeight / 2,
-      ermaloWidth, ermaloHeight
-    );
-    if (isCollidingWithErmalo && !hasDismissedErmaloPopup) {
-      showErmaloPopup = true;
-      if (!hasPlayedErmaloSound) {
-        ermaloSound.play();
-        hasPlayedErmaloSound = true;
-      }
-    } else if (!isCollidingWithErmalo) {
-      showErmaloPopup = false;
-      hasDismissedErmaloPopup = false;
-      hasPlayedErmaloSound = false;
-    }
-    if (showErmaloPopup) drawErmaloPopup();
-
-    let isCollidingWithMaxo = collides(
-      playerX, playerY, 75, 75,
-      maxoX - maxoWidth / 2,
-      maxoY - maxoHeight / 2,
-      maxoWidth, maxoHeight
-    );
-    if (isCollidingWithMaxo && !hasDismissedMaxoPopup) {
-      showMaxoPopup = true;
-      if (!hasPlayedMaxoSound) {
-        goriSound.play();
-        hasPlayedMaxoSound = true;
-      }
-    } else if (!isCollidingWithMaxo) {
-      showMaxoPopup = false;
-      hasDismissedMaxoPopup = false;
-      hasPlayedMaxoSound = false;
-    }
-    if (showMaxoPopup) drawMaxoPopup();
-
+    // **Giomari**
     let isCollidingWithGiomari = collides(
       playerX, playerY, 75, 75,
       giomariX - giomariWidth / 2,
@@ -322,48 +276,106 @@ function draw() {
     }
     if (showGiomariPopup) drawGiomariPopup();
 
+    // **Joniko**
+    let isCollidingWithJoniko = collides(
+      playerX, playerY, 75, 75,
+      jonikoX - jonikoWidth / 2,
+      jonikoY - jonikoHeight / 2,
+      jonikoWidth, jonikoHeight
+    );
+    if (isCollidingWithJoniko && !hasDismissedJonikoPopup) {
+      showJonikoPopup = true;
+      if (!hasPlayedJonikoSound) {
+        jonikoSound.play();
+        hasPlayedJonikoSound = true;
+      }
+    } else if (!isCollidingWithJoniko) {
+      showJonikoPopup = false;
+      hasDismissedJonikoPopup = false;
+      hasPlayedJonikoSound = false;
+    }
+    if (showJonikoPopup) drawJonikoPopup();
+
+    // **Ermalo**
+    let isCollidingWithErmalo = collides(
+      playerX, playerY, 75, 75,
+      ermaloX - ermaloWidth / 2,
+      ermaloY - ermaloHeight / 2,
+      ermaloWidth, ermaloHeight
+    );
+    if (isCollidingWithErmalo && !hasDismissedErmaloPopup) {
+      showErmaloPopup = true;
+      if (!hasPlayedErmaloSound) {
+        ermaloSound.play();
+        hasPlayedErmaloSound = true;
+      }
+    } else if (!isCollidingWithErmalo) {
+      showErmaloPopup = false;
+      hasDismissedErmaloPopup = false;
+      hasPlayedErmaloSound = false;
+    }
+    if (showErmaloPopup) drawErmaloPopup();
+
+    // **Maxo**
+    let isCollidingWithMaxo = collides(
+      playerX, playerY, 75, 75,
+      maxoX - maxoWidth / 2,
+      maxoY - maxoHeight / 2,
+      maxoWidth, maxoHeight
+    );
+    if (isCollidingWithMaxo && !hasDismissedMaxoPopup) {
+      showMaxoPopup = true;
+      if (!hasPlayedMaxoSound) {
+        goriSound.play();
+        hasPlayedMaxoSound = true;
+      }
+    } else if (!isCollidingWithMaxo) {
+      showMaxoPopup = false;
+      hasDismissedMaxoPopup = false;
+      hasPlayedMaxoSound = false;
+    }
+    if (showMaxoPopup) drawMaxoPopup();
+
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();
+    try {
+      if (showMiniMap) drawCinemaInteriorMiniMap();
+    } catch (error) {
+      console.error('Error rendering cinema minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
 
   } else if (gameState === 'hospitalInterior') {
     updateHospitalInteriorPosition();
     drawHospitalInterior();
-
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();
+    try {
+      if (showMiniMap) drawHospitalInteriorMiniMap();
+    } catch (error) {
+      console.error('Error rendering hospital minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
 
   } else if (gameState === 'schoolInterior') {
     updateSchoolInteriorPosition();
     drawSchoolInterior();
-
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();
+    try {
+      if (showMiniMap) drawSchoolInteriorMiniMap();
+    } catch (error) {
+      console.error('Error rendering school minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
 
   } else if (gameState === 'libraryInterior') {
+    if (!showMiniMap) minimapAlpha = 0;
     updateLibraryInteriorPosition();
     drawLibraryInterior();
-
     drawTouchControls();
-    if (showMiniMap) {
-      drawMiniMap();
+    try {
+      if (showMiniMap) drawLibraryInteriorMiniMap();
+    } catch (error) {
+      console.error('Error rendering library minimap:', error);
     }
-    if (showInventory) {
-      drawInventory();
-    }
+    if (showInventory) drawInventory();
   }
 }
