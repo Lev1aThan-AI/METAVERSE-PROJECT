@@ -43,6 +43,45 @@ function mousePressed() {
       return false;
     }
 
+    // MINUS button region (original at 60,230 size 30×30)
+    const minusX = popupX + 60 * scaleX;
+    const minusY = popupY + 220 * scaleY; // moved up 10px
+    const minusW = 30 * scaleX;
+    const minusH = 30 * scaleY;
+    if (
+      mouseX >= minusX && mouseX <= minusX + minusW &&
+      mouseY >= minusY && mouseY <= minusY + minusH
+    ) {
+      // decrease volume by 10% if music is on
+      if (!musicMuted) {
+        volumeLevel = constrain(volumeLevel - 0.1, 0, 1);
+        // adjust current music track volume
+        if (gameMusic && gameMusic.length) {
+          gameMusic[currentMusicIndex].setVolume(volumeLevel);
+        }
+      }
+      return false;
+    }
+
+    // PLUS button region (original at 305,230 size 30×30)
+    const plusX = popupX + 305 * scaleX;
+    const plusY = popupY + 220 * scaleY; // moved up 10px
+    const plusW = 30 * scaleX;
+    const plusH = 30 * scaleY;
+    if (
+      mouseX >= plusX && mouseX <= plusX + plusW &&
+      mouseY >= plusY && mouseY <= plusY + plusH
+    ) {
+      // increase volume by 10% if music is on
+      if (!musicMuted) {
+        volumeLevel = constrain(volumeLevel + 0.1, 0, 1);
+        if (gameMusic && gameMusic.length) {
+          gameMusic[currentMusicIndex].setVolume(volumeLevel);
+        }
+      }
+      return false;
+    }
+
     // Click outside the popup closes Settings
     if (
       mouseX < popupX ||
