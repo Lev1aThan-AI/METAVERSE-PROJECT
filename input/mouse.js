@@ -1,37 +1,53 @@
 // input/mouse.js
 
-function mousePressed() {
-    // ⬆️ NEW: If the in‑game Settings panel is open, route clicks to it and stop.
-    if (showSettings) {
-      handleSettingsClick(mouseX, mouseY);
-      return false;
-    }
-    // ⬆️ If the Settings panel is open, just close it on any click:
-    if (showSettings) {
-      showSettings = false;
-      return false;
-   }
+// input/mouse.js
 
+function mousePressed() {
+  // 1) If we’re on the title screen and Settings is open…
+  if (gameState === 'menu' && showSettings) {
+    // 1a) Define the popup’s rectangle (centered 300×300)
+    const popupX = width/2 - 150;
+    const popupY = height/2 - 150;
+    const popupW = 300;
+    const popupH = 300;
+    // 1b) If the click is outside that rect, close Settings
+    if (
+      mouseX < popupX ||
+      mouseX > popupX + popupW ||
+      mouseY < popupY ||
+      mouseY > popupY + popupH
+    ) {
+      showSettings = false;
+    }
+    // Stop here—don’t fall through to START/SETTINGS buttons
+    return false;
+  }
+
+  // 2) Normal title‐screen buttons (only when Settings is closed)
   if (gameState === 'menu') {
-    // START button (matches “START” wood graphic)
+    // START
     if (mouseX > 105 && mouseX < 255 &&
         mouseY > 400 && mouseY < 450) {
       gameState = 'game';
-      return;
+      return false;
     }
-    // SETTINGS button (matches “SETTINGS” wood graphic)
+    // SETTINGS (opens Settings when closed)
     if (mouseX > 105 && mouseX < 255 &&
         mouseY > 460 && mouseY < 510) {
-      showSettings = !showSettings;
-      return;
+      showSettings = true;
+      return false;
     }
-    // QUIT button (matches “QUIT” wood graphic)
+    // QUIT
     if (mouseX > 105 && mouseX < 255 &&
         mouseY > 520 && mouseY < 570) {
       window.close();
-      return;
+      return false;
     }
   }
+
+  // 3) …then all your other click handlers for shop, inventory, etc.…
+}
+
 
   // Handle Shop popup clicks
   if (showShopPopup && !showMarketplace) {
@@ -207,7 +223,7 @@ function mousePressed() {
       showInventory = false;
     }
   }
-}
+
 
 function mouseReleased() {
   // No actions needed
