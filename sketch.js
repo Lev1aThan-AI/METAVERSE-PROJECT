@@ -12,9 +12,6 @@ let draggingVolume = false;
 let showSettings = false;
 let musicMuted = false;
 
-
-
-
 let inventory = {
   apple: 0,
   sword: 0,
@@ -168,7 +165,7 @@ function setup() {
     y: healingStationY - healingStationHeight / 2,
     w: healingStationWidth, h: healingStationHeight });
 
-  // **ONLY CHANGED**: unlock audio on first user gesture, then start music loop
+  // Unlock audio on first user gesture, then start music loop
   userStartAudio().then(() => {
     startGameMusic();
   });
@@ -182,13 +179,6 @@ function draw() {
     if (showSettings) {
       drawSettingsWindow(); // now comes from settingsMenu.js
     }
-    function keyPressed() {
-      if (keyCode === ESCAPE && showSettings) {
-        showSettings = false;
-      }
-    }
-    
-
   } else if (gameState === 'game') {
     updatePlayerPosition();
     manageCoins();
@@ -218,6 +208,7 @@ function draw() {
     drawHPBar();
     drawLevelAndXP();
     drawCoinScore();
+    drawSoundButton();
     drawTouchControls();
     try {
       if (showMiniMap) drawMiniMap();
@@ -377,5 +368,19 @@ function draw() {
       console.error('Error rendering library minimap:', error);
     }
     if (showInventory) drawInventory();
+  }
+
+  // Draw settings window if showSettings is true, regardless of game state
+  if (showSettings) {
+    push();
+    resetMatrix();
+    drawSettingsWindow();
+    pop();
+  }
+}
+
+function keyPressed() {
+  if (keyCode === ESCAPE && showSettings) {
+    showSettings = false;
   }
 }

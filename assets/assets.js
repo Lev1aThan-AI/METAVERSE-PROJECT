@@ -35,7 +35,7 @@ let hpbarImage;
 let coinBalanceImage;     // ← add this
 let xpBalanceImage; 
 let settingsImage;
-
+let soundButtonImage;
 
 
 
@@ -92,7 +92,7 @@ function preload() {
   settingsImage   = loadImage('assets/settings.png');  // ← preload settings panel graphic
   // Load the new settings icon
   giomariImage = loadImage('assets/Giomari.png', () => console.log('Loaded Giomari.png'));
-
+  soundButtonImage = loadImage('assets/soundbutton.png');
   // Load sounds
   jonikoSound = loadSound('assets/Joniko sound 1.mp3');
   goriSound   = loadSound('assets/gori sound 2.mp3');
