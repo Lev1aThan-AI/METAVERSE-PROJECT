@@ -371,6 +371,12 @@ function draw() {
     }
     if (showInventory) drawInventory();
   }
+ // only tint when we’re not on the menu
+if (gameState !== 'menu') {
+  drawDayOverlay();
+  drawSunriseOverlay();
+}
+
 
   // Draw settings window if showSettings is true, regardless of game state
   if (showSettings) {
