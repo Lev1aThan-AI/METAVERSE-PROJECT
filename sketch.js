@@ -209,6 +209,8 @@ function draw() {
     drawLevelAndXP();
     drawCoinScore();
     drawSoundButton();
+    drawLocalTime();
+
     drawTouchControls();
     try {
       if (showMiniMap) drawMiniMap();
