@@ -1,7 +1,7 @@
 let gameState = 'menu';
 let playerX, playerY;
 let mapWidth = 4000;
-let mapHeight = 4000;
+let mapHeight = 8000;
 let cameraX, cameraY;
 let zoom = 0.6;
 let showMiniMap = false;
@@ -11,10 +11,9 @@ let volumeLevel = 0.5;
 let draggingVolume = false;
 let showSettings = false;
 let musicMuted = false;
-// ── torch animation state ───────────────────────────────────────
-let torchFrames    = [];    // holds the 3 loaded images
-let torches        = [];    // each torch’s {x,y} on the map
-const TORCH_FRAME_MS = 100; // 100ms per frame ≈ smooth flicker
+let torchFrames = [];
+let torches = [];
+const TORCH_FRAME_MS = 100;
 
 let inventory = {
   apple: 0,
@@ -33,7 +32,6 @@ let showComputerPopup = false;
 let hasDismissedComputerPopup = false;
 let hasGatekeeperAccess = false;
 
-// Joniko variables (center, higher up)
 let jonikoX = 600;
 let jonikoY = 300;
 let jonikoWidth = 90;
@@ -42,7 +40,6 @@ let showJonikoPopup = false;
 let hasDismissedJonikoPopup = false;
 let hasPlayedJonikoSound = false;
 
-// Ermalo variables (left side)
 let ermaloX = 340;
 let ermaloY = 450;
 let ermaloWidth = 90;
@@ -51,7 +48,6 @@ let showErmaloPopup = false;
 let hasDismissedErmaloPopup = false;
 let hasPlayedErmaloSound = false;
 
-// Maxo variables (right side)
 let maxoX = 860;
 let maxoY = 450;
 let maxoWidth = 90;
@@ -60,7 +56,6 @@ let showMaxoPopup = false;
 let hasDismissedMaxoPopup = false;
 let hasPlayedMaxoSound = false;
 
-// Giomari variables (middle, between Ermalo and Maxo)
 let giomariX = 600;
 let giomariY = 450;
 let giomariWidth = 90;
@@ -69,31 +64,26 @@ let showGiomariPopup = false;
 let hasDismissedGiomariPopup = false;
 let hasPlayedGioMariSound = false;
 
-// Healing Station variables (center of hospital)
 let healingStationX = 600;
 let healingStationY = 600;
 let healingStationWidth = 150;
 let healingStationHeight = 150;
 
-// Hospital interior
 let hospitalInterior = {
   width: 1200,
   height: 1200
 };
 
-// School interior
 let schoolInterior = {
   width: 1200,
   height: 1200
 };
 
-// Library interior
 let libraryInterior = {
   width: 1200,
   height: 1200
 };
 
-// Touchpoint variables for the bottom center of shop.png
 let touchpointX;
 let touchpointY;
 let touchpointWidth = 50;
@@ -128,6 +118,7 @@ let cinemaInterior = {
 };
 
 let isTransitioning = false;
+let lastWaterDamageTime = 0;
 
 function setup() {
   createCanvas(360, 640);
@@ -141,21 +132,17 @@ function setup() {
   generateObstacles();
   spawnCoins();
 
-    // ── place torches evenly along each cobblestone path’s edges ──
-    const IDEAL_SPACING = 200;      // pixels between torches
-    for (let path of cobblestonePaths) {
-      let count   = floor(path.h / IDEAL_SPACING) || 1;
-      let spacing = path.h / (count + 1);
-      for (let i = 1; i <= count; i++) {
-        let y = path.y + spacing * i;
-        // left edge
-        torches.push({ x: path.x,           y: y });
-        // right edge
-        torches.push({ x: path.x + path.w, y: y });
-      }
+  const IDEAL_SPACING = 200;
+  for (let path of cobblestonePaths) {
+    let count = floor(path.h / IDEAL_SPACING) || 1;
+    let spacing = path.h / (count + 1);
+    for (let i = 1; i <= count; i++) {
+      let y = path.y + spacing * i;
+      torches.push({ x: path.x, y: y });
+      torches.push({ x: path.x + path.w, y: y });
     }
-  
- 
+  }
+
   for (let level = 1; level <= 99; level++) {
     xpToNextLevel[level] = 10 * (level * level) + 10;
   }
@@ -181,10 +168,9 @@ function setup() {
     w: giomariWidth, h: giomariHeight });
   obstacles.push({ type: 'healing_station',
     x: healingStationX - healingStationWidth / 2,
-    y: healingStationY - healingStationHeight / 2,
+    y: healingStationY - healingStationWidth / 2,
     w: healingStationWidth, h: healingStationHeight });
 
-  // Unlock audio on first user gesture, then start music loop
   userStartAudio().then(() => {
     startGameMusic();
   });
@@ -196,16 +182,27 @@ function draw() {
   if (gameState === 'menu') {
     drawMenu();
     if (showSettings) {
-      drawSettingsWindow(); // now comes from settingsMenu.js
+      drawSettingsWindow();
     }
   } else if (gameState === 'game') {
     updatePlayerPosition();
     manageCoins();
 
+    // Check if player is in water (y > 4000 and y <= 6000, excluding bridge x=1975 to x=2025)
+    if (playerY > 4000 && playerY <= 6000 && (playerX < 1975 || playerX > 2025)) {
+      let currentTime = millis();
+      if (currentTime - lastWaterDamageTime >= 1000) { // 1 second interval
+        playerHP = max(0, playerHP - 10); // Lose 10 HP per second
+        lastWaterDamageTime = currentTime;
+      }
+    } else {
+      lastWaterDamageTime = 0; // Reset timer when not in water
+    }
+
     cameraX = playerX - width / (2 * zoom);
     cameraY = playerY - height / (2 * zoom);
     cameraX = constrain(cameraX, 0, mapWidth - width / zoom);
-    cameraY = constrain(cameraY, 0, mapHeight - height / zoom);
+    cameraY = constrain(cameraY, 0, mapHeight - width / zoom);
 
     drawGame();
 
@@ -268,7 +265,6 @@ function draw() {
     updateCinemaInteriorPosition();
     drawCinemaInterior();
 
-    // **Giomari**
     let isCollidingWithGiomari = collides(
       playerX, playerY, 75, 75,
       giomariX - giomariWidth / 2,
@@ -288,7 +284,6 @@ function draw() {
     }
     if (showGiomariPopup) drawGiomariPopup();
 
-    // **Joniko**
     let isCollidingWithJoniko = collides(
       playerX, playerY, 75, 75,
       jonikoX - jonikoWidth / 2,
@@ -308,7 +303,6 @@ function draw() {
     }
     if (showJonikoPopup) drawJonikoPopup();
 
-    // **Ermalo**
     let isCollidingWithErmalo = collides(
       playerX, playerY, 75, 75,
       ermaloX - ermaloWidth / 2,
@@ -328,7 +322,6 @@ function draw() {
     }
     if (showErmaloPopup) drawErmaloPopup();
 
-    // **Maxo**
     let isCollidingWithMaxo = collides(
       playerX, playerY, 75, 75,
       maxoX - maxoWidth / 2,
@@ -390,14 +383,12 @@ function draw() {
     }
     if (showInventory) drawInventory();
   }
- // only tint when we’re not on the menu
-if (gameState !== 'menu') {
-  drawDayOverlay();
-  drawSunriseOverlay();
-}
 
+  if (gameState !== 'menu') {
+    drawDayOverlay();
+    drawSunriseOverlay();
+  }
 
-  // Draw settings window if showSettings is true, regardless of game state
   if (showSettings) {
     push();
     resetMatrix();

@@ -46,6 +46,13 @@ let cobblestonePaths = [
   }
 ];
 
+let bridge = {
+  x: 2000 - 25,
+  y: 4000,
+  w: 50,
+  h: 4000
+};
+
 function drawGame() {
   push();
   translate(width / 2, height / 2);
@@ -53,7 +60,7 @@ function drawGame() {
   translate(-cameraX - width / (2 * zoom),
             -cameraY - height / (2 * zoom));
 
-  // Grass background
+  // Grass background (extended to 8000 height)
   imageMode(CORNER);
   if (grassImage && grassImage.width > 0 && grassImage.height > 0) {
     let tileSize = 768;
@@ -70,6 +77,14 @@ function drawGame() {
     fill(34, 139, 34);
     rect(0, 0, mapWidth, mapHeight);
   }
+
+  // Water (y=4000 to y=6000, excluding bridge)
+  fill(0, 105, 148); // Blue for water
+  rect(0, 4000, mapWidth, 2000); // Water area
+
+  // Bridge (overwrites water where applicable)
+  fill(139, 69, 19); // Brown for bridge
+  rect(bridge.x, bridge.y, bridge.w, bridge.h);
 
   // Cobblestone paths
   imageMode(CORNER);
@@ -117,26 +132,21 @@ function drawGame() {
     }
   }
 
-  drawBuildings(); // This already includes the hospital via buildings.js
+  drawBuildings();
   drawObstacles();
   drawCoins();
   drawPlayer();
-  // ── torch flicker animation ────────────────────────────────────
-   // ── torch flicker animation ────────────────────────────────────
-   let frame = floor(millis() / TORCH_FRAME_MS) % torchFrames.length;
-   push();
-     imageMode(CENTER);
-     for (let t of torches) {
-       // subtract half‐height (32px) so the torch base sits on the ground
-       image(torchFrames[frame], t.x, t.y - 32, 64, 96);
-     }
-   pop();
- 
- 
-   pop();
-  
 
-  // Gatekeeper popup
+  let frame = floor(millis() / TORCH_FRAME_MS) % torchFrames.length;
+  push();
+  imageMode(CENTER);
+  for (let t of torches) {
+    image(torchFrames[frame], t.x, t.y - 32, 64, 96);
+  }
+  pop();
+
+  pop();
+
   if (showGatekeeperPopup) {
     drawGatekeeperPopup();
   }

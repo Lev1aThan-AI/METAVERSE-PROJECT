@@ -12,44 +12,47 @@ function generateObstacles() {
       x = random(0, mapWidth - bushSize);
       y = random(0, mapHeight - bushSize);
 
-      let overlapsCastle = x + bushSize > castleX && x < castleX + castleWidth &&
-                          y + bushSize > castleY && y < castleY + castleHeight;
-      let overlapsCobblestone = false;
-      let overlapsCarpet = false;
+      // Ensure bushes spawn only on grass (y <= 4000 or y > 6000)
+      if (y <= 4000 || y > 6000) {
+        let overlapsCastle = x + bushSize > castleX && x < castleX + castleWidth &&
+                            y + bushSize > castleY && y < castleY + castleHeight;
+        let overlapsCobblestone = false;
+        let overlapsCarpet = false;
 
-      for (let path of cobblestonePaths) {
-        if (x + bushSize > path.x && x < path.x + path.w &&
-            y + bushSize > path.y && y < path.y + path.h) {
-          overlapsCobblestone = true;
-          break;
+        for (let path of cobblestonePaths) {
+          if (x + bushSize > path.x && x < path.x + path.w &&
+              y + bushSize > path.y && y < path.y + path.h) {
+            overlapsCobblestone = true;
+            break;
+          }
         }
-      }
 
-      for (let road of roads) {
-        if (x + bushSize > road.x && x < road.x + road.w &&
-            y + bushSize > road.y && y < road.y + road.h) {
-          overlapsCarpet = true;
-          break;
+        for (let road of roads) {
+          if (x + bushSize > road.x && x < road.x + road.w &&
+              y + bushSize > road.y && y < road.y + road.h) {
+            overlapsCarpet = true;
+            break;
+          }
         }
-      }
 
-      let overlapsShop = x + bushSize > shopX && x < shopX + shopWidth &&
-                         y + bushSize > shopY && y < shopY + shopHeight;
+        let overlapsShop = x + bushSize > shopX && x < shopX + shopWidth &&
+                           y + bushSize > shopY && y < shopY + shopHeight;
 
-      let overlapsCinema = x + bushSize > cinemaX && x < cinemaX + cinemaWidth &&
-                           y + bushSize > cinemaY && y < cinemaY + cinemaHeight;
+        let overlapsCinema = x + bushSize > cinemaX && x < cinemaX + cinemaWidth &&
+                             y + bushSize > cinemaY && y < cinemaY + cinemaHeight;
 
-      let overlapsHospital = x + bushSize > hospitalX && x < hospitalX + hospitalWidth &&
-                             y + bushSize > hospitalY && y < hospitalY + hospitalHeight;
+        let overlapsHospital = x + bushSize > hospitalX && x < hospitalX + hospitalWidth &&
+                               y + bushSize > hospitalY && y < hospitalY + hospitalHeight;
 
-      let overlapsSchool = x + bushSize > schoolX && x < schoolX + schoolWidth &&
-                           y + bushSize > schoolY && y < schoolY + schoolHeight;
+        let overlapsSchool = x + bushSize > schoolX && x < schoolX + schoolWidth &&
+                             y + bushSize > schoolY && y < schoolY + schoolHeight;
 
-      let overlapsLibrary = x + bushSize > libraryX && x < libraryX + libraryWidth &&
-                           y + bushSize > libraryY && y < libraryY + libraryHeight;
+        let overlapsLibrary = x + bushSize > libraryX && x < libraryX + libraryWidth &&
+                             y + bushSize > libraryY && y < libraryY + libraryHeight;
 
-      if (!overlapsCastle && !overlapsCobblestone && !overlapsCarpet && !overlapsShop && !overlapsCinema && !overlapsHospital && !overlapsSchool && !overlapsLibrary) {
-        validPosition = true;
+        if (!overlapsCastle && !overlapsCobblestone && !overlapsCarpet && !overlapsShop && !overlapsCinema && !overlapsHospital && !overlapsSchool && !overlapsLibrary) {
+          validPosition = true;
+        }
       }
     }
 
@@ -74,55 +77,58 @@ function generateObstacles() {
       x = random(0, mapWidth - treeWidth);
       y = random(0, mapHeight - treeHeight);
 
-      let overlapsCastle = x + treeWidth > castleX && x < castleX + castleWidth &&
-                           y + treeHeight > castleY && y < castleY + castleHeight;
-      let overlapsCobblestone = false;
-      let overlapsCarpet = false;
+      // Ensure trees spawn only on grass (y <= 4000 or y > 6000)
+      if (y <= 4000 || y > 6000) {
+        let overlapsCastle = x + treeWidth > castleX && x < castleX + castleWidth &&
+                             y + treeHeight > castleY && y < castleY + castleHeight;
+        let overlapsCobblestone = false;
+        let overlapsCarpet = false;
 
-      for (let path of cobblestonePaths) {
-        if (x + treeWidth > path.x && x < path.x + path.w &&
-            y + treeHeight > path.y && y < path.y + path.h) {
-          overlapsCobblestone = true;
-          break;
-        }
-      }
-
-      for (let road of roads) {
-        if (x + treeWidth > road.x && x < road.x + road.w &&
-            y + treeHeight > road.y && y < road.y + road.h) {
-          overlapsCarpet = true;
-          break;
-        }
-      }
-
-      let overlapsShop = x + treeWidth > shopX && x < shopX + shopWidth &&
-                         y + treeHeight > shopY && y < shopY + shopHeight;
-
-      let overlapsCinema = x + treeWidth > cinemaX && x < cinemaX + cinemaWidth &&
-                           y + treeHeight > cinemaY && y < cinemaY + cinemaHeight;
-
-      let overlapsHospital = x + treeWidth > hospitalX && x < hospitalX + hospitalWidth &&
-                             y + treeHeight > hospitalY && y < hospitalY + hospitalHeight;
-
-      let overlapsSchool = x + treeWidth > schoolX && x < schoolX + schoolWidth &&
-                           y + treeHeight > schoolY && y < schoolY + schoolHeight;
-
-      let overlapsLibrary = x + treeWidth > libraryX && x < libraryX + libraryWidth &&
-                           y + treeHeight > libraryY && y < libraryY + libraryHeight;
-
-      let overlapsBush = false;
-      for (let obstacle of obstacles) {
-        if (obstacle.type === 'bush') {
-          if (x + treeWidth > obstacle.x && x < obstacle.x + obstacle.w &&
-              y + treeHeight > obstacle.y && y < obstacle.y + obstacle.h) {
-            overlapsBush = true;
+        for (let path of cobblestonePaths) {
+          if (x + treeWidth > path.x && x < path.x + path.w &&
+              y + treeHeight > path.y && y < path.y + path.h) {
+            overlapsCobblestone = true;
             break;
           }
         }
-      }
 
-      if (!overlapsCastle && !overlapsCobblestone && !overlapsCarpet && !overlapsShop && !overlapsCinema && !overlapsHospital && !overlapsSchool && !overlapsLibrary && !overlapsBush) {
-        validPosition = true;
+        for (let road of roads) {
+          if (x + treeWidth > road.x && x < road.x + road.w &&
+              y + treeHeight > road.y && y < road.y + road.h) {
+            overlapsCarpet = true;
+            break;
+          }
+        }
+
+        let overlapsShop = x + treeWidth > shopX && x < shopX + shopWidth &&
+                           y + treeHeight > shopY && y < shopY + shopHeight;
+
+        let overlapsCinema = x + treeWidth > cinemaX && x < cinemaX + cinemaWidth &&
+                             y + treeHeight > cinemaY && y < cinemaY + cinemaHeight;
+
+        let overlapsHospital = x + treeWidth > hospitalX && x < hospitalX + hospitalWidth &&
+                               y + treeHeight > hospitalY && y < hospitalY + hospitalHeight;
+
+        let overlapsSchool = x + treeWidth > schoolX && x < schoolX + schoolWidth &&
+                             y + treeHeight > schoolY && y < schoolY + schoolHeight;
+
+        let overlapsLibrary = x + treeWidth > libraryX && x < libraryX + libraryWidth &&
+                             y + treeHeight > libraryY && y < libraryY + libraryHeight;
+
+        let overlapsBush = false;
+        for (let obstacle of obstacles) {
+          if (obstacle.type === 'bush') {
+            if (x + treeWidth > obstacle.x && x < obstacle.x + obstacle.w &&
+                y + treeHeight > obstacle.y && y < obstacle.y + obstacle.h) {
+              overlapsBush = true;
+              break;
+            }
+          }
+        }
+
+        if (!overlapsCastle && !overlapsCobblestone && !overlapsCarpet && !overlapsShop && !overlapsCinema && !overlapsHospital && !overlapsSchool && !overlapsLibrary && !overlapsBush) {
+          validPosition = true;
+        }
       }
     }
 

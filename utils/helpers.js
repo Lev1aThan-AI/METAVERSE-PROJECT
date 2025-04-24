@@ -34,6 +34,15 @@ function collidesWithTree(newX, newY, tree) {
 }
 
 function isWalkable(x, y) {
+  // Check water (y=4000 to y=6000, excluding bridge x=1975 to x=2025)
+  if (y > 4000 && y <= 6000 && (x < 1975 || x > 2025)) {
+    return false;
+  }
+  // Grass area (y>6000) is walkable
+  if (y > 6000) {
+    return true;
+  }
+
   for (let obstacle of obstacles) {
     if (obstacle.type === 'bush') {
       if (collides(x - COIN_RADIUS, y - COIN_RADIUS, COIN_RADIUS * 2, COIN_RADIUS * 2, obstacle.x, obstacle.y, obstacle.w, obstacle.h)) {
@@ -88,7 +97,7 @@ function isWalkable(x, y) {
 
     if (imgX >= 0 && imgX < cinemaImage.width && imgY >= 0 && imgY < cinemaImage.height) {
       cinemaImage.loadPixels();
-      let index = 4 * (int(imgY) * cinemaImage.width + int(imgX));
+      let index = 4 * (int(imgY) * castleImage.width + int(imgX));
       let alpha = cinemaImage.pixels[index + 3];
       if (alpha > 0) {
         return false;
