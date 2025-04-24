@@ -128,7 +128,7 @@ function drawGame() {
      imageMode(CENTER);
      for (let t of torches) {
        // subtract half‐height (32px) so the torch base sits on the ground
-       image(torchFrames[frame], t.x, t.y - 32, 32, 64);
+       image(torchFrames[frame], t.x, t.y - 32, 64, 96);
      }
    pop();
  
