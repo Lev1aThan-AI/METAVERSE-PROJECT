@@ -91,9 +91,16 @@ function preload() {
   // Restore Giomari image
   settingsImage   = loadImage('assets/settings.png');  // ← preload settings panel graphic
   // Load the new settings icon
+  torchFrames = [];
+  torchFrames[0] = loadImage('assets/torchanimation1.png');
+  torchFrames[1] = loadImage('assets/torchanimation2.png');
+  torchFrames[2] = loadImage('assets/torchanimation3.png');
   giomariImage = loadImage('assets/Giomari.png', () => console.log('Loaded Giomari.png'));
   soundButtonImage = loadImage('assets/soundbutton.png');
   // Load sounds
+
+ 
+
   jonikoSound = loadSound('assets/Joniko sound 1.mp3');
   goriSound   = loadSound('assets/gori sound 2.mp3');
   gioMariSound= loadSound('assets/Gio mari sound 1.mp3');

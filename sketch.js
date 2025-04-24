@@ -11,6 +11,10 @@ let volumeLevel = 0.5;
 let draggingVolume = false;
 let showSettings = false;
 let musicMuted = false;
+// ── torch animation state ───────────────────────────────────────
+let torchFrames    = [];    // holds the 3 loaded images
+let torches        = [];    // each torch’s {x,y} on the map
+const TORCH_FRAME_MS = 100; // 100ms per frame ≈ smooth flicker
 
 let inventory = {
   apple: 0,
@@ -137,6 +141,21 @@ function setup() {
   generateObstacles();
   spawnCoins();
 
+    // ── place torches evenly along each cobblestone path’s edges ──
+    const IDEAL_SPACING = 200;      // pixels between torches
+    for (let path of cobblestonePaths) {
+      let count   = floor(path.h / IDEAL_SPACING) || 1;
+      let spacing = path.h / (count + 1);
+      for (let i = 1; i <= count; i++) {
+        let y = path.y + spacing * i;
+        // left edge
+        torches.push({ x: path.x,           y: y });
+        // right edge
+        torches.push({ x: path.x + path.w, y: y });
+      }
+    }
+  
+ 
   for (let level = 1; level <= 99; level++) {
     xpToNextLevel[level] = 10 * (level * level) + 10;
   }

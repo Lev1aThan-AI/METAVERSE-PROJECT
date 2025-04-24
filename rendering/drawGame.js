@@ -121,8 +121,20 @@ function drawGame() {
   drawObstacles();
   drawCoins();
   drawPlayer();
-
-  pop();
+  // ── torch flicker animation ────────────────────────────────────
+   // ── torch flicker animation ────────────────────────────────────
+   let frame = floor(millis() / TORCH_FRAME_MS) % torchFrames.length;
+   push();
+     imageMode(CENTER);
+     for (let t of torches) {
+       // subtract half‐height (32px) so the torch base sits on the ground
+       image(torchFrames[frame], t.x, t.y - 32, 32, 64);
+     }
+   pop();
+ 
+ 
+   pop();
+  
 
   // Gatekeeper popup
   if (showGatekeeperPopup) {

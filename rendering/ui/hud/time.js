@@ -54,7 +54,7 @@ function drawDayOverlay() {
     // 1) Full-screen HSL tint (clearer, less foggy)
     colorMode(HSL, 360, 100, 100, 1);
     noStroke();
-    fill(220, 30, L, 0.4);    // alpha 0.4 instead of 0.6
+    fill(220, 30, L, 0.1);    // alpha 0.4 instead of 0.6
     rect(0, 0, width, height);
   
     // 2) Softer edge vignette
