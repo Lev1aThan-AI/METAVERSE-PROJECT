@@ -47,10 +47,10 @@ let cobblestonePaths = [
 ];
 
 let bridge = {
-  x: 2000 - 25,
+  x: 2000 - 150,
   y: 4000,
-  w: 50,
-  h: 4000
+  w: 300,
+  h: 2000
 };
 
 function drawGame() {
@@ -82,10 +82,9 @@ function drawGame() {
   fill(0, 105, 148); // Blue for water
   rect(0, 4000, mapWidth, 2000); // Water area
 
-  // Bridge (overwrites water where applicable)
-  fill(139, 69, 19); // Brown for bridge
-  rect(bridge.x, bridge.y, bridge.w, bridge.h);
-
+   // Bridge (overwrites water where applicable)
+// Bridge (overwrites water where applicable)
+image(bridgeImage, bridge.x, bridge.y, bridge.w, bridge.h);
   // Cobblestone paths
   imageMode(CORNER);
   for (let path of cobblestonePaths) {

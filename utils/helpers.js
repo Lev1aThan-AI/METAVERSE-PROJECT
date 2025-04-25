@@ -34,8 +34,9 @@ function collidesWithTree(newX, newY, tree) {
 }
 
 function isWalkable(x, y) {
-  // Check water (y=4000 to y=6000, excluding bridge x=1975 to x=2025)
-  if (y > 4000 && y <= 6000 && (x < 1975 || x > 2025)) {
+ 
+// Check water (y=4000 to y=6000, excluding bridge x=1850 to x=2150)
+if (y > 4000 && y <= 6000 && (x < 1850 || x > 2150))   {
     return false;
   }
   // Grass area (y>6000) is walkable

@@ -37,7 +37,7 @@ let xpBalanceImage;
 let settingsImage;
 let soundButtonImage;
 let gameOverImage;
-
+let bridgeImage;
 
 // === Sound vars ===
 let jonikoSound;
@@ -99,7 +99,7 @@ function preload() {
   soundButtonImage = loadImage('assets/soundbutton.png');
   // Load sounds
   gameOverImage = loadImage('assets/gameover.png');
- 
+  bridgeImage = loadImage('assets/bridge.png');
 
   jonikoSound = loadSound('assets/Joniko sound 1.mp3');
   goriSound   = loadSound('assets/gori sound 2.mp3');

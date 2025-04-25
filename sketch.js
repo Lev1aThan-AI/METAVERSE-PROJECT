@@ -191,8 +191,9 @@ function draw() {
     updatePlayerPosition();
     manageCoins();
 
-    // Check if player is in water (y > 4000 and y <= 6000, excluding bridge x=1975 to x=2025)
-    if (playerY > 4000 && playerY <= 6000 && (playerX < 1975 || playerX > 2025)) {
+ 
+// Check if player is in water (y > 4000 and y <= 6000, excluding bridge x=1850 to x=2150)
+if (playerY > 4000 && playerY <= 6000 && (playerX < 1850 || playerX > 2150))   {
       let currentTime = millis();
       if (currentTime - lastWaterDamageTime >= 1000) { // 1 second interval
         playerHP = max(0, playerHP - 10); // Lose 10 HP per second
