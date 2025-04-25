@@ -1,3 +1,6 @@
+let waterFrameIndex = 0;
+const WATER_FRAME_MS = 600; // Duration per frame in milliseconds
+
 let roads = [
   {
     x: 2000 - 25,
@@ -78,9 +81,9 @@ function drawGame() {
     rect(0, 0, mapWidth, mapHeight);
   }
 
-  // Water (y=4000 to y=6000, excluding bridge)
-  fill(0, 105, 148); // Blue for water
-  rect(0, 4000, mapWidth, 2000); // Water area
+/// Water animation (y=4000 to y=6000)
+waterFrameIndex = floor(millis() / WATER_FRAME_MS) % 3; // Cycle through 3 frames
+image(waterFrames[waterFrameIndex], 0, 4000, mapWidth, 2000);
 
    // Bridge (overwrites water where applicable)
 // Bridge (overwrites water where applicable)

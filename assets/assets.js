@@ -38,6 +38,7 @@ let settingsImage;
 let soundButtonImage;
 let gameOverImage;
 let bridgeImage;
+let waterFrames = [];
 
 // === Sound vars ===
 let jonikoSound;
@@ -100,7 +101,10 @@ function preload() {
   // Load sounds
   gameOverImage = loadImage('assets/gameover.png');
   bridgeImage = loadImage('assets/bridge.png');
-
+  waterFrames[0] = loadImage('assets/water1.png');
+  waterFrames[1] = loadImage('assets/water2.png');
+  waterFrames[2] = loadImage('assets/water3.png');
+  
   jonikoSound = loadSound('assets/Joniko sound 1.mp3');
   goriSound   = loadSound('assets/gori sound 2.mp3');
   gioMariSound= loadSound('assets/Gio mari sound 1.mp3');
