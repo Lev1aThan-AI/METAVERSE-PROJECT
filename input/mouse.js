@@ -156,7 +156,7 @@ function mousePressed() {
   // 7) Computer popup
   if (showComputerPopup) {
     if (mouseX > width/2 - 110 && mouseX < width/2 - 10 && mouseY > height/2 + 10 && mouseY < height/2 + 50) {
-      window.open('https://discord.gg/5W7CbDwp','_blank');
+      window.open('https://discord.gg/G6yZ4uTX','_blank');
       showComputerPopup = false;
       hasDismissedComputerPopup = true;
     } else {

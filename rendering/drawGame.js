@@ -1,5 +1,5 @@
 let waterFrameIndex = 0;
-const WATER_FRAME_MS = 600; // Duration per frame in milliseconds
+const WATER_FRAME_MS = 800; // Duration per frame in milliseconds
 
 let roads = [
   {
