@@ -36,7 +36,7 @@ let coinBalanceImage;     // ← add this
 let xpBalanceImage; 
 let settingsImage;
 let soundButtonImage;
-
+let gameOverImage;
 
 
 // === Sound vars ===
@@ -98,7 +98,7 @@ function preload() {
   giomariImage = loadImage('assets/Giomari.png', () => console.log('Loaded Giomari.png'));
   soundButtonImage = loadImage('assets/soundbutton.png');
   // Load sounds
-
+  gameOverImage = loadImage('assets/gameover.png');
  
 
   jonikoSound = loadSound('assets/Joniko sound 1.mp3');

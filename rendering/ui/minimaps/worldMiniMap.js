@@ -185,12 +185,12 @@ function drawMiniMap() {
   miniMapBuffer.triangle(-3, 4, 3, 4, 0, -4);
   miniMapBuffer.pop();
 
-  // Position the minimap
-  let miniMapX = width - miniMapWidth - 100;
-  let miniMapY = 250;
+  // Position the minimap (centered as a popup)
+  let miniMapX = (width - miniMapWidth) / 2; // Center: (360-160)/2 = 100
+  let miniMapY = (height - miniMapHeight) / 2; // Center: (640-160)/2 = 240
 
   minimapTargetAlpha = showMiniMap ? 255 : 0;
-  minimapAlpha = lerp(minimapAlpha, minimapTargetAlpha, FADE_SPEED);
+  minimapAlpha = showMiniMap ? 255 : 0; // Set alpha directly for immediate visibility
 
   if (minimapAlpha <= 0) return;
 

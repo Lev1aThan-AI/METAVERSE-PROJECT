@@ -226,7 +226,26 @@ function mousePressed() {
       showInventory = false;
     }
     return false;
+  }// 13) Game over "Restart" button
+if (gameState === 'gameOver') {
+  // Check if the click is within the "Restart" button bounds (x: 150 to 350, y: 330 to 385)
+  if (mouseX >= 150 && mouseX <= 350 && mouseY >= 330 && mouseY <= 385) {
+    // Reset the game state to 'game'
+    gameState = 'game';
+    // Reset player position to spawn point near the castle
+    playerX = 2000;
+    playerY = 850;
+    // Reset player health
+    playerHP = 100;
+    // Reset camera position to center on the player
+    cameraX = playerX - width / (2 * zoom);
+    cameraY = playerY - height / (2 * zoom);
+    // Reset water damage timer
+    lastWaterDamageTime = 0;
+    return false;
   }
+}
+
 }
 
 function mouseReleased() {

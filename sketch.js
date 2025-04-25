@@ -177,8 +177,11 @@ function setup() {
 }
 
 function draw() {
-  background(220);
-
+  if (gameState === 'gameOver') {
+    background(0); // Set background to black for game over
+  } else {
+    background(220); // Set background to light gray for other states
+  }
   if (gameState === 'menu') {
     drawMenu();
     if (showSettings) {
@@ -197,6 +200,11 @@ function draw() {
       }
     } else {
       lastWaterDamageTime = 0; // Reset timer when not in water
+    }
+
+    // Check for death
+    if (playerHP <= 0) {
+      gameState = 'gameOver';
     }
 
     cameraX = playerX - width / (2 * zoom);
@@ -382,6 +390,15 @@ function draw() {
       console.error('Error rendering library minimap:', error);
     }
     if (showInventory) drawInventory();
+  }    else if (gameState === 'gameOver') {
+    // Render game over popup
+    if (gameOverImage && gameOverImage.width > 0 && gameOverImage.height > 0) {
+      imageMode(CENTER);
+      image(gameOverImage, width / 2, height / 2, 360, 360); // Centered, scaled to fit canvas width
+    } else {
+      fill(255, 0, 0);
+      rect((width - 360) / 2, (height - 360) / 2, 360, 360); // Fallback red rectangle
+    }
   }
 
   if (gameState !== 'menu') {
